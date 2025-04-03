@@ -19,5 +19,5 @@ permissions:
     description: "Allows testing the MOTD"
     default: op
   dreimotd.list:
-    description: "Allows listing all MOTDs
+    description: "Allows listing all MOTDs"
     default: op
