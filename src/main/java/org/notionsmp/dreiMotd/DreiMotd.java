@@ -1,0 +1,206 @@
+package org.notionsmp.dreiMotd;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor {
+
+    private MiniMessage miniMessage;
+    private List<Map<String, Object>> motds;
+    private boolean motdEnabled;
+
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
+        miniMessage = MiniMessage.miniMessage();
+        loadConfig();
+        getServer().getPluginManager().registerEvents(this, this);
+        getCommand("dreimotd").setExecutor(this);
+        getCommand("dreimotd").setTabCompleter(this);
+    }
+
+    private void loadConfig() {
+        FileConfiguration config = getConfig();
+        motdEnabled = config.getBoolean("enabled", true);
+
+        motds = new ArrayList<>();
+        ConfigurationSection motdsSection = config.getConfigurationSection("motds");
+        if (motdsSection != null) {
+            for (String key : motdsSection.getKeys(false)) {
+                motds.add(motdsSection.getConfigurationSection(key).getValues(true));
+            }
+        }
+
+        if (motds.isEmpty()) {
+            Object oldFormat = config.isList("motd") ? config.getStringList("motd") : config.getString("motd");
+            if (oldFormat != null) {
+                Map<String, Object> legacyMotd = Map.of(
+                        "message", oldFormat,
+                        "permission", ""
+                );
+                motds.add(legacyMotd);
+            }
+        }
+
+        saveConfig();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!motdEnabled) return;
+        sendMotd(event.getPlayer());
+    }
+
+    private void sendMotd(Player player) {
+        String playerName = player.getName();
+
+        for (Map<String, Object> motd : motds) {
+
+            String permission = (String) motd.getOrDefault("permission", "");
+            if (!permission.isEmpty() && !player.hasPermission(permission)) {
+                continue;
+            }
+
+            Object message = motd.get("message");
+            if (message instanceof List) {
+                for (String line : (List<String>) message) {
+                    sendFormattedMessage(player, line);
+                }
+            } else if (message instanceof String) {
+                sendFormattedMessage(player, (String) message);
+            }
+        }
+    }
+
+    private void sendFormattedMessage(Player player, String message) {
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            message = PlaceholderAPI.setPlaceholders(player, message);
+        }
+        player.sendMessage(miniMessage.deserialize(message,
+                Placeholder.unparsed("player", player.getName()),
+                Placeholder.unparsed("displayname", miniMessage.serialize(player.displayName())),
+                Placeholder.unparsed("world", player.getWorld().getName()),
+                Placeholder.unparsed("online_players", String.valueOf(Bukkit.getOnlinePlayers().size())),
+                Placeholder.unparsed("max_players", String.valueOf(Bukkit.getMaxPlayers())),
+                Placeholder.unparsed("server_name", Bukkit.getServer().getName()),
+                Placeholder.unparsed("server_version", Bukkit.getServer().getVersion()),
+                Placeholder.unparsed("time", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))),
+                Placeholder.unparsed("date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+        ));
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 0) {
+            showHelp(sender);
+            return true;
+        }
+
+        switch (args[0].toLowerCase()) {
+            case "reload":
+                if (!sender.hasPermission("dreimotd.reload")) {
+                    sender.sendMessage(miniMessage.deserialize("<red>No permission!</red>"));
+                    return true;
+                }
+                reloadConfig();
+                loadConfig();
+                sender.sendMessage(miniMessage.deserialize("<green>Config reloaded!</green>"));
+                return true;
+
+            case "test":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(miniMessage.deserialize("<red>Only players can test!</red>"));
+                    return true;
+                }
+                if (!sender.hasPermission("dreimotd.test")) {
+                    sender.sendMessage(miniMessage.deserialize("<red>No permission!</red>"));
+                    return true;
+                }
+                testMotd((Player) sender);
+                return true;
+
+            case "list":
+                if (!sender.hasPermission("dreimotd.list")) {
+                    sender.sendMessage(miniMessage.deserialize("<red>No permission!</red>"));
+                    return true;
+                }
+                listMotds(sender);
+                return true;
+
+            default:
+                showHelp(sender);
+                return true;
+        }
+    }
+
+    private void listMotds(CommandSender sender) {
+        sender.sendMessage(miniMessage.deserialize("<gradient:gold:yellow>DreiMotd List</gradient>"));
+
+        for (int i = 0; i < motds.size(); i++) {
+            Map<String, Object> motd = motds.get(i);
+            String permission = (String) motd.getOrDefault("permission", "none");
+            String preview = motd.get("message") instanceof List ?
+                    ((List<?>) motd.get("message")).get(0).toString() :
+                    motd.get("message").toString();
+
+            if (preview.length() > 30) {
+                preview = preview.substring(0, 27) + "...";
+            }
+
+            sender.sendMessage(miniMessage.deserialize(
+                    "<gray>#"+ (i+1) + "</gray> - " +
+                            "<white>" + preview + "</white>\n" +
+                            "  <gray>Permission: " + permission + "</gray>"
+            ));
+        }
+    }
+
+    private void testMotd(Player player) {
+        player.sendMessage(miniMessage.deserialize("<gradient:gold:yellow>Testing MOTD...</gradient>"));
+        sendMotd(player);
+    }
+
+    private void showHelp(CommandSender sender) {
+        sender.sendMessage(miniMessage.deserialize(
+                "<gradient:gold:yellow>DreiMotd Help</gradient>\n" +
+                        "<gray>/dreimotd reload</gray> - Reload config\n" +
+                        "<gray>/dreimotd test</gray> - Test MOTD\n" +
+                        (sender.hasPermission("dreimotd.list") ? "<gray>/dreimotd list</gray> - List all MOTDs\n" : "")
+        ));
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 1) {
+            List<String> completions = new ArrayList<>();
+            if (sender.hasPermission("dreimotd.reload")) completions.add("reload");
+            if (sender.hasPermission("dreimotd.test") && sender instanceof Player) completions.add("test");
+            if (sender.hasPermission("dreimotd.list")) completions.add("list");
+            return completions;
+        }
+        return new ArrayList<>();
+    }
+}

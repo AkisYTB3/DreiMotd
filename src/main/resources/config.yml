@@ -1,0 +1,34 @@
+# Old format (still supported for backward compatibility)
+# Can be either a single string or a list of strings
+# motd: "<gradient:gold:yellow>Welcome <player> to the server!</gradient>"
+# motd:
+#   - "<gradient:gold:yellow>Welcome <player>!</gradient>"
+#   - "<gray>Enjoy your stay!</gray>"
+#   - "<rainbow>Server version: <server_version></rainbow>"
+
+# New format (recommended) - allows multiple MOTDs with permissions
+motds:
+  # MOTD 1 - VIP message (requires vip.motd permission)
+  1:
+    permission: "vip.motd"
+    message: "<gradient:gold:yellow>Welcome VIP <player>!</gradient>"
+
+  # MOTD 2 - Staff message (requires staff.motd permission)
+  2:
+    permission: "staff.motd"
+    message:
+      - "<red>STAFF NOTICE:</red>"
+      - "<gray>Next meeting: <time> today</gray>"
+
+  # MOTD 3 - Public message (no permission required)
+  3:
+    message: "<gray>Online: <online_players>/<max_players> | World: <world></gray>"
+
+  # MOTD 4 - Another public message
+  4:
+    message:
+      - "<gradient:green:blue>Server version: <server_version></gradient>"
+      - "<gradient:red:yellow>Current time: <time></gradient>"
+
+# Enable/disable the MOTD system
+enabled: true

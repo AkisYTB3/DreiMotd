@@ -1,0 +1,23 @@
+name: DreiMotd
+version: ${version}
+main: org.notionsmp.dreiMotd.DreiMotd
+api-version: '1.21'
+author: "Akis (discord: yeahakis)"
+softdepend: [PlaceholderAPI]
+
+commands:
+  dreimotd:
+    description: "DreiMotd commands"
+    usage: "/dreimotd [reload|test|list]"
+    aliases: [dmotd]
+
+permissions:
+  dreimotd.reload:
+    description: "Allows reloading the config"
+    default: op
+  dreimotd.test:
+    description: "Allows testing the MOTD"
+    default: op
+  dreimotd.list:
+    description: "Allows listing all MOTDs
+    default: op
