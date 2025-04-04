@@ -32,6 +32,7 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
 
     @Override
     public void onEnable() {
+        setupDefaultConfig();
         saveDefaultConfig();
         miniMessage = MiniMessage.miniMessage();
         loadConfig();
@@ -40,9 +41,28 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
         getCommand("dreimotd").setTabCompleter(this);
     }
 
-    private void loadConfig() {
+    private void setupDefaultConfig() {
         FileConfiguration config = getConfig();
-        motdEnabled = config.getBoolean("settings.enabled", true);
+
+        config.addDefault("settings.enabled", true);
+        config.addDefault("settings.convert-legacy-to-modern", true);
+
+        config.options().copyDefaults(true);
+        saveConfig();
+    }
+
+    private void loadConfig() {
+        reloadConfig();
+        FileConfiguration config = getConfig();
+
+        if (config.contains("enabled")) {
+            motdEnabled = config.getBoolean("enabled");
+            config.set("settings.enabled", motdEnabled);
+            config.set("enabled", null);
+            saveConfig();
+        } else {
+            motdEnabled = config.getBoolean("settings.enabled", true);
+        }
 
         motds = new ArrayList<>();
         ConfigurationSection motdsSection = config.getConfigurationSection("motds");
@@ -62,8 +82,6 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
                 motds.add(legacyMotd);
             }
         }
-
-        saveConfig();
     }
 
     @EventHandler
@@ -76,7 +94,6 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
         String playerName = player.getName();
 
         for (Map<String, Object> motd : motds) {
-
             String permission = (String) motd.getOrDefault("permission", "");
             if (!permission.isEmpty() && !player.hasPermission(permission)) {
                 continue;

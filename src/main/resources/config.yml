@@ -6,6 +6,8 @@
 #   - "<gray>Enjoy your stay!</gray>"
 #   - "<rainbow>Server version: <server_version></rainbow>"
 
+
+
 # New format (recommended) - allows multiple MOTDs with permissions
 motds:
   # MOTD 1 - VIP message (requires vip.motd permission)
