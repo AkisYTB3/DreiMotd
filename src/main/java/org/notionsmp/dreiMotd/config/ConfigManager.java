@@ -15,6 +15,10 @@ public class ConfigManager {
     private List<Map<String, Object>> motds;
     private boolean motdEnabled;
 
+    public ConfigManager() {
+        loadConfig();
+    }
+
     public void setupDefaultConfig() {
         FileConfiguration config = DreiMotd.getInstance().getConfig();
 
