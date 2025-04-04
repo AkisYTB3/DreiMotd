@@ -32,8 +32,8 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
 
     @Override
     public void onEnable() {
-        setupDefaultConfig();
         saveDefaultConfig();
+        setupDefaultConfig();
         miniMessage = MiniMessage.miniMessage();
         loadConfig();
         getServer().getPluginManager().registerEvents(this, this);
