@@ -1,9 +1,16 @@
 plugins {
     id 'java'
+    id 'com.palantir.git-version' version '3.0.0'
 }
 
 group = project.group
-version = project.version
+
+def gitVersion = versionDetails()
+def gitHash = gitVersion.gitHash.substring(0, 7)
+
+version = project.version.toString().endsWith("-dev") ?
+        "${project.version}-${gitHash}" :
+        project.version
 
 repositories {
     mavenCentral()
