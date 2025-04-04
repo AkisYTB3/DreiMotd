@@ -35,5 +35,6 @@ motds:
 settings:
   # Enable/disable the MOTD system
   enabled: true
-  # should legacy colors (&c) be converted to modern format (<red>)?
+  # should legacy colors (&c) be converted to modern format (<red>)
+  # useful for stuff like %essentials_nickname%
   convert-legacy-to-modern: true
