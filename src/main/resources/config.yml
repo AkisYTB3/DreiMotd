@@ -30,5 +30,8 @@ motds:
       - "<gradient:green:blue>Server version: <server_version></gradient>"
       - "<gradient:red:yellow>Current time: <time></gradient>"
 
-# Enable/disable the MOTD system
-enabled: true
+settings:
+  # Enable/disable the MOTD system
+  enabled: true
+  # should legacy colors (&c) be converted to modern format (<red>)?
+  convert-legacy-to-modern: true

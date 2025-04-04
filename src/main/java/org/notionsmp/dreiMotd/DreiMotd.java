@@ -42,7 +42,7 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
 
     private void loadConfig() {
         FileConfiguration config = getConfig();
-        motdEnabled = config.getBoolean("enabled", true);
+        motdEnabled = config.getBoolean("settings.enabled", true);
 
         motds = new ArrayList<>();
         ConfigurationSection motdsSection = config.getConfigurationSection("motds");
@@ -97,7 +97,9 @@ public final class DreiMotd extends JavaPlugin implements Listener, TabExecutor 
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             message = PlaceholderAPI.setPlaceholders(player, message);
         }
-        message = convertLegacyColors(message);
+
+        if (getConfig().getBoolean("settings.convert-legacy-to-modern", true)) message = convertLegacyColors(message);
+
         player.sendMessage(miniMessage.deserialize(message,
                 Placeholder.unparsed("player", player.getName()),
                 Placeholder.unparsed("displayname", miniMessage.serialize(player.displayName())),
