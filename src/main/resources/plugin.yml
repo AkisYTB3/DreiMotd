@@ -4,13 +4,6 @@ main: org.notionsmp.dreiMotd.DreiMotd
 api-version: '1.21'
 author: "Akis (discord: yeahakis)"
 softdepend: [PlaceholderAPI]
-
-commands:
-  dreimotd:
-    description: "DreiMotd commands"
-    usage: "/dreimotd [reload|test|list]"
-    aliases: [dmotd]
-
 permissions:
   dreimotd.reload:
     description: "Allows reloading the config"
