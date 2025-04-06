@@ -22,11 +22,16 @@ public class ConfigManager {
     public void setupDefaultConfig() {
         FileConfiguration config = DreiMotd.getInstance().getConfig();
 
-        config.addDefault("settings.enabled", true);
-        config.addDefault("settings.convert-legacy-to-modern", true);
+        addSetting("enabled", true);
+        addSetting("convert-legacy-to-modern", true);
 
         config.options().copyDefaults(true);
         DreiMotd.getInstance().saveConfig();
+    }
+
+    private void addSetting(String setting, Object value) {
+        FileConfiguration config = DreiMotd.getInstance().getConfig();
+        config.addDefault("settings." + setting, value);
     }
 
     public void loadConfig() {
