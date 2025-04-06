@@ -3,6 +3,7 @@ package org.notionsmp.dreiMotd.config;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.Nullable;
 import org.notionsmp.dreiMotd.DreiMotd;
 
 import java.util.ArrayList;
@@ -31,8 +32,11 @@ public class ConfigManager {
     }
 
     private void addSetting(String setting, Object value) {
-        FileConfiguration config = DreiMotd.getInstance().getConfig();
-        config.addDefault("settings." + setting, value);
+        DreiMotd.getInstance().getConfig().addDefault("settings." + setting, value);
+    }
+
+    public @Nullable Object getSetting(String setting) {
+        return DreiMotd.getInstance().getConfig().get("settings." + setting);
     }
 
     public void loadConfig() {

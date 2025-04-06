@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.notionsmp.dreiMotd.DreiMotd;
 import org.notionsmp.dreiMotd.utils.MessageUtils;
 
@@ -21,7 +22,27 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (!DreiMotd.getInstance().getConfigManager().isMotdEnabled()) return;
-        sendMotd(event.getPlayer());
+
+        long delay = 0;
+        Object delaySetting = DreiMotd.getInstance().getConfigManager().getSetting("delay");
+
+        if (delaySetting instanceof Number) {
+            delay = ((Number) delaySetting).longValue();
+        } else if (delaySetting != null) {
+            try {
+                delay = Long.parseLong(delaySetting.toString());
+            } catch (NumberFormatException e) {
+                delay = 0;
+                e.printStackTrace();
+            }
+        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                sendMotd(event.getPlayer());
+            }
+        }.runTaskLater(DreiMotd.getInstance(), delay);
     }
 
     public void sendMotd(Player player) {
