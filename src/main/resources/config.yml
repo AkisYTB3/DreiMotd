@@ -33,10 +33,6 @@ motds:
       - "<gradient:red:yellow>Current time: <time></gradient>"
 
 settings:
-  # Enable/disable the MOTD system
-  enabled: true
-  # should legacy colors (&c or §c) be converted to modern format (<red>)
-  # useful for stuff like %essentials_nickname%
-  convert-legacy-to-modern: true
-  # delay for the motd to be sent, useful if some placeholders don't get parsed yet
-  delay: 0
+  enabled: true # whether the motd should send
+  convert-legacy-to-modern: true # convert &c and §c to <red>
+  delay: 0 # delay for the motd to be sent (20 = 1 second)
