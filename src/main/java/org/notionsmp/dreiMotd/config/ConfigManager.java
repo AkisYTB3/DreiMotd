@@ -24,6 +24,7 @@ public class ConfigManager {
 
         addSetting("enabled", true);
         addSetting("convert-legacy-to-modern", true);
+        addSetting("delay", 0);
 
         config.options().copyDefaults(true);
         DreiMotd.getInstance().saveConfig();
