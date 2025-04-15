@@ -15,6 +15,7 @@ public class ConfigManager {
     @Getter
     private List<Map<String, Object>> motds;
     private boolean motdEnabled;
+    private boolean firstLoad = false;
 
     public ConfigManager() {
         loadConfig();
@@ -23,9 +24,11 @@ public class ConfigManager {
     public void setupDefaultConfig() {
         FileConfiguration config = DreiMotd.getInstance().getConfig();
 
-        addSetting("enabled", true);
-        addSetting("convert-legacy-to-modern", true);
-        addSetting("delay", 0);
+        if (firstLoad) {
+            addSetting("enabled", true);
+            addSetting("convert-legacy-to-modern", true);
+            addSetting("delay", 0);
+        }
 
         config.options().copyDefaults(true);
         DreiMotd.getInstance().saveConfig();
@@ -42,6 +45,10 @@ public class ConfigManager {
     public void loadConfig() {
         DreiMotd.getInstance().reloadConfig();
         FileConfiguration config = DreiMotd.getInstance().getConfig();
+
+        firstLoad = config.getKeys(false).isEmpty();
+
+        setupDefaultConfig();
 
         if (config.contains("enabled")) {
             motdEnabled = config.getBoolean("enabled");
