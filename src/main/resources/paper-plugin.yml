@@ -3,7 +3,11 @@ version: ${version}
 main: org.notionsmp.dreiMotd.DreiMotd
 api-version: '1.21'
 author: "Akis (discord: yeahakis)"
-softdepend: [PlaceholderAPI]
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
 permissions:
   dreimotd.reload:
     description: "Allows reloading the config"

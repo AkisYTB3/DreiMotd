@@ -1,4 +1,4 @@
-# Old format (still supported for backward compatibility)
+# Simple format
 # Can be either a single string or a list of strings
 # motd: "<gradient:gold:yellow>Welcome <player> to the server!</gradient>"
 # motd:
@@ -6,7 +6,9 @@
 #   - "<gray>Enjoy your stay!</gray>"
 #   - "<rainbow>Server version: <server_version></rainbow>"
 
-# New format (recommended) - allows multiple MOTDs with permissions
+
+
+# Advanced format (recommended) - allows multiple MOTDs with permissions
 motds:
   # MOTD 1 - VIP message (requires vip.motd permission)
   1:
@@ -30,5 +32,7 @@ motds:
       - "<gradient:green:blue>Server version: <server_version></gradient>"
       - "<gradient:red:yellow>Current time: <time></gradient>"
 
-# Enable/disable the MOTD system
-enabled: true
+settings:
+  enabled: true # whether the motd should send
+  convert-legacy-to-modern: true # convert &c and §c to <red>
+  delay: 0 # delay for the motd to be sent (20 = 1 second)
