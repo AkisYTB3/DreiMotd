@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.notionsmp.dreiMotd.commands.DreiMotdCommand;
 import org.notionsmp.dreiMotd.config.ConfigManager;
 import org.notionsmp.dreiMotd.listeners.PlayerJoinListener;
+import org.notionsmp.dreiMotd.utils.Metrics;
 
 @Getter
 public final class DreiMotd extends JavaPlugin {
@@ -24,5 +25,11 @@ public final class DreiMotd extends JavaPlugin {
 
         commandManager = new PaperCommandManager(this);
         commandManager.registerCommand(new DreiMotdCommand());
+
+        initMetrics();
+    }
+
+    private void initMetrics() {
+        Metrics metrics = new Metrics(this, 25705);
     }
 }
